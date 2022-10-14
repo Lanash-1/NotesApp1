@@ -5,9 +5,9 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
+import com.example.notesapp.helper.NotesDBHelper
 
 class NotesProvider: ContentProvider() {
-
 
     companion object{
         private const val PROVIDER_NAME = "com.example.notesapp.provider/NotesProvider"
@@ -21,22 +21,28 @@ class NotesProvider: ContentProvider() {
 
     private lateinit var db: SQLiteDatabase
 
-
-
     override fun onCreate(): Boolean {
-        TODO("Not yet implemented")
+        val notesHelper = NotesDBHelper(context)
+        db = notesHelper.writableDatabase
+        return true
     }
 
-    override fun insert(uri: Uri, cv: ContentValues?): Uri? {
-        TODO("Not yet implemented")
+    override fun insert(uri: Uri, cv: ContentValues?): Uri {
+        db.insert("NOTES", null, cv)
+        context?.contentResolver?.notifyChange(uri, null)
+        return uri
     }
 
     override fun update(uri: Uri, cv: ContentValues?, condition: String?, conditionValues: Array<out String>?): Int {
-        TODO("Not yet implemented")
+        val count = db.update("NOTES", cv, condition, conditionValues)
+        context?.contentResolver?.notifyChange(uri, null)
+        return count
     }
 
     override fun delete(uri: Uri, condition: String?, conditionValues: Array<out String>?): Int {
-        TODO("Not yet implemented")
+        val count = db.delete("NOTES", condition, conditionValues)
+        context?.contentResolver?.notifyChange(uri, null)
+        return count
     }
 
     override fun query(
@@ -46,10 +52,10 @@ class NotesProvider: ContentProvider() {
         conditionValues: Array<out String>?,
         order: String?
     ): Cursor? {
-        TODO("Not yet implemented")
+        return db.query("NOTES", columns, condition, conditionValues, null, null, order)
     }
 
     override fun getType(uri: Uri): String? {
-        TODO("Not yet implemented")
+        return "vnd.android.cursor.dir/vnd.example.PERSON"
     }
 }

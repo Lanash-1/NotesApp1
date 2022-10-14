@@ -10,7 +10,7 @@ class NotesDBHelper(
 
 
     override fun onCreate(db: SQLiteDatabase?) {
-        val createTable = "CREATE TABLE NOTES(ID INTEGER PRIMARY KEY, TITLE TEXT NOT NULL, NOTE TEXT NOT NULL, COLOR TEXT NOT NULL)"
+        val createTable = "CREATE TABLE NOTES(ID INTEGER PRIMARY KEY AUTOINCREMENT, TITLE TEXT NOT NULL, NOTE TEXT NOT NULL, COLOR TEXT NOT NULL)"
         db?.execSQL(createTable)
     }
 

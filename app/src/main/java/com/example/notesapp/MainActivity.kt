@@ -1,5 +1,7 @@
 package com.example.notesapp
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -51,6 +53,12 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawers()
             true
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#576DE4")))
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

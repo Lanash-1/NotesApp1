@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.notesapp.adapter.NotesListAdapter
 import com.example.notesapp.dataclass.Note
 import com.example.notesapp.interfaces.OnItemClickListener
+import com.example.notesapp.provider.NotesProvider
 import com.example.notesapp.viewModel.NotesViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -35,17 +36,12 @@ class NotesFragment : Fragment() {
 
         (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        var notesList = listOf(
-            Note(1, "Untitled note 1", "lore sdjnd sod shjdn sdichsdis sdi2 weif feirrhf sd", "#A2E1DB"),
-            Note(2, "Android study materials", "android official documentation", "#FFCCB6"),
-            Note(3, "Meeting agenda", "1. Welcome note 2. Report speech 3. budget planning 4. Ending note", "#F3B0C3"),
-            Note(4, "How to print hello world in kotlin", "To print anything in kotlin we have to use println() and inside paranthesis withind double quotes type what you want", "#FFFFB5")
-        )
 
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
 
         fab.setOnClickListener {
             viewModel.note = Note(0, "", "", "#DDDDDD")
+            viewModel.notePosition = 0
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
                 addToBackStack(null)
@@ -54,7 +50,8 @@ class NotesFragment : Fragment() {
 
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
-                viewModel.note = notesList[position]
+                viewModel.note = viewModel.dbNotesList[position]
+                viewModel.notePosition = position
                 parentFragmentManager.commit {
                     replace(R.id.notesFragment, NewNoteFragment())
                     addToBackStack(null)
@@ -63,11 +60,26 @@ class NotesFragment : Fragment() {
         })
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.notes_recyclerView)
-
-        adapter.setNotesList(notesList)
+        getNotesList()
+        adapter.setNotesList(viewModel.dbNotesList)
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = GridLayoutManager(context, 2)
+    }
+
+    private fun getNotesList() {
+        val contentResolver = (activity as AppCompatActivity).contentResolver!!
+        val result = contentResolver.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
+        if(result!!.moveToNext()){
+            viewModel.dbNotesList = mutableListOf()
+            do{
+                val id = result.getInt(0)
+                val title = result.getString(1)
+                val content = result.getString(2)
+                val color = result.getString(3)
+                viewModel.dbNotesList.add(Note(id, title, content, color))
+            }while(result.moveToNext())
+        }
     }
 
 }
