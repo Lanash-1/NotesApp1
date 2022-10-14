@@ -41,7 +41,7 @@ class NotesFragment : Fragment() {
 
         fab.setOnClickListener {
             viewModel.note = Note(0, "", "", "#DDDDDD")
-            viewModel.notePosition = 0
+            viewModel.notePosition = -1
             parentFragmentManager.commit {
                 replace(R.id.notesFragment, NewNoteFragment())
                 addToBackStack(null)

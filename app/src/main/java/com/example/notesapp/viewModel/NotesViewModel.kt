@@ -25,5 +25,5 @@ class NotesViewModel: ViewModel() {
         Note(4, "How to print hello world in kotlin", "To print anything in kotlin we have to use println() and inside paranthesis withind double quotes type what you want", "#FFFFB5")
     )
 
-    var notePosition = 0
+    var notePosition = -1
 }

@@ -62,7 +62,7 @@ class NewNoteFragment : Fragment() {
         when(item.itemId){
             R.id.done -> {
                 println(viewModel.notePosition)
-                if(viewModel.notePosition == 0){
+                if(viewModel.notePosition == -1){
                     viewModel.noteTitle = titleText.text.toString()
                     viewModel.noteContent = noteText.text.toString()
                     viewModel.noteColor = "#D4F0F0"
@@ -80,7 +80,7 @@ class NewNoteFragment : Fragment() {
                 moveToNotesFragment()
             }
             R.id.delete -> {
-                if(viewModel.notePosition != 0){
+                if(viewModel.notePosition != -1){
                     deleteNoteFromDB(viewModel.dbNotesList[viewModel.notePosition].id)
                 }
                 moveToNotesFragment()
