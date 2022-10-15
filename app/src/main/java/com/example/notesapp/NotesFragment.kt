@@ -1,5 +1,8 @@
 package com.example.notesapp
 
+// imports
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -34,7 +37,10 @@ class NotesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(false)
+            setBackgroundDrawable(ColorDrawable(Color.parseColor("#576DE4")))
+        }
 
 
         val fab = view.findViewById<FloatingActionButton>(R.id.create_note_fab)
@@ -79,6 +85,8 @@ class NotesFragment : Fragment() {
                 val color = result.getString(3)
                 viewModel.dbNotesList.add(Note(id, title, content, color))
             }while(result.moveToNext())
+        }else{
+            viewModel.dbNotesList = mutableListOf()
         }
     }
 

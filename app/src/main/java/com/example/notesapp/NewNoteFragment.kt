@@ -7,22 +7,29 @@ import android.os.Bundle
 import android.view.*
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.notesapp.adapter.ColorAdapter
+import com.example.notesapp.interfaces.OnItemClickListener
 import com.example.notesapp.provider.NotesProvider
+import com.example.notesapp.viewModel.ColorViewModel
 import com.example.notesapp.viewModel.NotesViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
 class NewNoteFragment : Fragment() {
 
-    private val viewModel: NotesViewModel by activityViewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
+    private val colorViewModel: ColorViewModel by activityViewModels()
 
     private lateinit var noteText: EditText
     private lateinit var titleText: EditText
 
-
-
+    var colorAdapter = ColorAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,16 +48,19 @@ class NewNoteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AppCompatActivity).supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor(viewModel.note.color)))
+        (activity as AppCompatActivity).supportActionBar?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.parseColor(notesViewModel.note.color)))
+            setDisplayHomeAsUpEnabled(true)
+        }
 
         titleText = view.findViewById(R.id.titleText)
         noteText = view.findViewById(R.id.noteText)
 
-        println(viewModel.note)
+        println(notesViewModel.note)
 
-        titleText.setText(viewModel.note.title)
-        noteText.setText(viewModel.note.note)
-        view.setBackgroundColor(Color.parseColor(viewModel.note.color))
+        titleText.setText(notesViewModel.note.title)
+        noteText.setText(notesViewModel.note.note)
+        setNoteColor(notesViewModel.note.color)
 
     }
 
@@ -61,33 +71,65 @@ class NewNoteFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.done -> {
-                println(viewModel.notePosition)
-                if(viewModel.notePosition == -1){
-                    viewModel.noteTitle = titleText.text.toString()
-                    viewModel.noteContent = noteText.text.toString()
-                    viewModel.noteColor = "#D4F0F0"
-                    if(viewModel.noteTitle.isNotEmpty() || viewModel.noteContent.isNotEmpty()){
+                println(notesViewModel.notePosition)
+                if(notesViewModel.notePosition == -1){
+                    notesViewModel.noteTitle = titleText.text.toString()
+                    notesViewModel.noteContent = noteText.text.toString()
+                    if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
                         insertNote()
                     }
 //                    viewModel.notesList.add(Note(0, titleText.text.toString(), noteText.text.toString(), "#DDDDDD"))
                 }else{
-                    viewModel.noteTitle = titleText.text.toString()
-                    viewModel.noteContent = noteText.text.toString()
-                    viewModel.noteColor = "#D4F0F0"
-                    viewModel.noteId = viewModel.dbNotesList[viewModel.notePosition].id
+                    notesViewModel.noteTitle = titleText.text.toString()
+                    notesViewModel.noteContent = noteText.text.toString()
+                    notesViewModel.noteColor = notesViewModel.noteColor
+                    notesViewModel.noteId = notesViewModel.dbNotesList[notesViewModel.notePosition].id
                     updateNoteInDB()
                 }
                 moveToNotesFragment()
             }
             R.id.delete -> {
-                if(viewModel.notePosition != -1){
-                    deleteNoteFromDB(viewModel.dbNotesList[viewModel.notePosition].id)
+                if(notesViewModel.notePosition != -1){
+                    deleteNoteFromDB(notesViewModel.dbNotesList[notesViewModel.notePosition].id)
                 }
                 moveToNotesFragment()
+            }
+            R.id.colorPicker -> {
+                openColorPicker()
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openColorPicker() {
+//        Toast.makeText(context, "color picker", Toast.LENGTH_SHORT).show()
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.color_picker_bottom_sheet_dialog, null)
+        dialog.setCancelable(true)
+        dialog.setContentView(view)
+        dialog.show()
+        val colorRecyclerView = view.findViewById<RecyclerView>(R.id.colorRV)
+        colorAdapter.setColorList(colorViewModel.colors)
+        colorRecyclerView.adapter = colorAdapter
+        colorRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+        colorAdapter.setOnItemClickListener(object: OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                setNoteColor(colorViewModel.colors[position])
+            }
+
+        })
+
+    }
+
+    private fun setNoteColor(color: String) {
+        notesViewModel.noteColor = color
+        notesViewModel.note.color = color
+        val layout = requireView().findViewById<ConstraintLayout>(R.id.noteLayout)
+//        view?.setBackgroundColor(Color.parseColor(notesViewModel.note.color))
+        layout.setBackgroundColor(Color.parseColor(color))
+        (activity as AppCompatActivity).supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor(color)))
     }
 
     private fun deleteNoteFromDB(noteId: Int) {
@@ -101,12 +143,12 @@ class NewNoteFragment : Fragment() {
 
         val contentResolver = (activity as AppCompatActivity).contentResolver!!
         val result = contentResolver.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
-
+        println("COLOR = ${notesViewModel.noteColor}")
         val cv = ContentValues()
-        cv.put(NotesProvider.COLUMN_TITLE, viewModel.noteTitle)
-        cv.put(NotesProvider.COLUMN_NOTE, viewModel.noteContent)
-        cv.put(NotesProvider.COLUMN_COLOR, viewModel.noteColor)
-        contentResolver.update(NotesProvider.CONTENT_URI, cv, "ID = ?", arrayOf(viewModel.noteId.toString()))
+        cv.put(NotesProvider.COLUMN_TITLE, notesViewModel.noteTitle)
+        cv.put(NotesProvider.COLUMN_NOTE, notesViewModel.noteContent)
+        cv.put(NotesProvider.COLUMN_COLOR, notesViewModel.noteColor)
+        contentResolver.update(NotesProvider.CONTENT_URI, cv, "ID = ?", arrayOf(notesViewModel.noteId.toString()))
         result?.requery()
     }
 
@@ -114,9 +156,9 @@ class NewNoteFragment : Fragment() {
         val contentResolver = (activity as AppCompatActivity).contentResolver!!
         val result = contentResolver?.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
         val cv = ContentValues()
-        cv.put(NotesProvider.COLUMN_TITLE, viewModel.noteTitle)
-        cv.put(NotesProvider.COLUMN_NOTE, viewModel.noteContent)
-        cv.put(NotesProvider.COLUMN_COLOR, viewModel.noteColor)
+        cv.put(NotesProvider.COLUMN_TITLE, notesViewModel.noteTitle)
+        cv.put(NotesProvider.COLUMN_NOTE, notesViewModel.noteContent)
+        cv.put(NotesProvider.COLUMN_COLOR, notesViewModel.noteColor)
         contentResolver.insert(NotesProvider.CONTENT_URI, cv)
         result?.requery()
     }
