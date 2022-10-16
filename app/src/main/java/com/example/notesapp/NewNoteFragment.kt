@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -29,11 +30,10 @@ class NewNoteFragment : Fragment() {
     private lateinit var noteText: EditText
     private lateinit var titleText: EditText
 
-    var colorAdapter = ColorAdapter()
+    private var colorAdapter = ColorAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setHasOptionsMenu(true)
     }
 
@@ -56,8 +56,6 @@ class NewNoteFragment : Fragment() {
         titleText = view.findViewById(R.id.titleText)
         noteText = view.findViewById(R.id.noteText)
 
-        println(notesViewModel.note)
-
         titleText.setText(notesViewModel.note.title)
         noteText.setText(notesViewModel.note.note)
         setNoteColor(notesViewModel.note.color)
@@ -70,6 +68,10 @@ class NewNoteFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
+            android.R.id.home -> {
+                moveToNotesFragment()
+
+            }
             R.id.done -> {
                 println(notesViewModel.notePosition)
                 if(notesViewModel.notePosition == -1){
@@ -78,7 +80,6 @@ class NewNoteFragment : Fragment() {
                     if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
                         insertNote()
                     }
-//                    viewModel.notesList.add(Note(0, titleText.text.toString(), noteText.text.toString(), "#DDDDDD"))
                 }else{
                     notesViewModel.noteTitle = titleText.text.toString()
                     notesViewModel.noteContent = noteText.text.toString()
@@ -98,17 +99,16 @@ class NewNoteFragment : Fragment() {
                 openColorPicker()
             }
         }
-
         return super.onOptionsItemSelected(item)
     }
 
     private fun openColorPicker() {
-//        Toast.makeText(context, "color picker", Toast.LENGTH_SHORT).show()
         val dialog = BottomSheetDialog(requireContext())
         val view = layoutInflater.inflate(R.layout.color_picker_bottom_sheet_dialog, null)
         dialog.setCancelable(true)
         dialog.setContentView(view)
         dialog.show()
+
         val colorRecyclerView = view.findViewById<RecyclerView>(R.id.colorRV)
         colorAdapter.setColorList(colorViewModel.colors)
         colorRecyclerView.adapter = colorAdapter
@@ -118,16 +118,19 @@ class NewNoteFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 setNoteColor(colorViewModel.colors[position])
             }
-
         })
 
+        val selectBtn = view.findViewById<TextView>(R.id.selectColor)
+        selectBtn.setOnClickListener {
+            dialog.dismiss()
+        }
     }
+
 
     private fun setNoteColor(color: String) {
         notesViewModel.noteColor = color
         notesViewModel.note.color = color
         val layout = requireView().findViewById<ConstraintLayout>(R.id.noteLayout)
-//        view?.setBackgroundColor(Color.parseColor(notesViewModel.note.color))
         layout.setBackgroundColor(Color.parseColor(color))
         (activity as AppCompatActivity).supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor(color)))
     }
@@ -166,6 +169,7 @@ class NewNoteFragment : Fragment() {
     private fun moveToNotesFragment(){
         parentFragmentManager.commit {
             replace(R.id.notesFragment, NotesFragment())
+            parentFragmentManager.popBackStack()
         }
     }
 

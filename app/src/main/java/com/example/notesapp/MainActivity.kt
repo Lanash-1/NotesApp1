@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager.commit {
             replace(R.id.notesFragment, NotesFragment())
-            addToBackStack(null)
         }
 
 //        val navView = findViewById<NavigationView>(R.id.navView)
@@ -58,7 +57,6 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#576DE4")))
-
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
