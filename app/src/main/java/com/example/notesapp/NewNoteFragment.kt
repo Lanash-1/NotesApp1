@@ -69,25 +69,10 @@ class NewNoteFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             android.R.id.home -> {
-                moveToNotesFragment()
-
+                insertOrUpdateDb()
             }
             R.id.done -> {
-                println(notesViewModel.notePosition)
-                if(notesViewModel.notePosition == -1){
-                    notesViewModel.noteTitle = titleText.text.toString()
-                    notesViewModel.noteContent = noteText.text.toString()
-                    if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
-                        insertNote()
-                    }
-                }else{
-                    notesViewModel.noteTitle = titleText.text.toString()
-                    notesViewModel.noteContent = noteText.text.toString()
-                    notesViewModel.noteColor = notesViewModel.noteColor
-                    notesViewModel.noteId = notesViewModel.dbNotesList[notesViewModel.notePosition].id
-                    updateNoteInDB()
-                }
-                moveToNotesFragment()
+                insertOrUpdateDb()
             }
             R.id.delete -> {
                 if(notesViewModel.notePosition != -1){
@@ -100,6 +85,23 @@ class NewNoteFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun insertOrUpdateDb() {
+        if(notesViewModel.notePosition == -1){
+            notesViewModel.noteTitle = titleText.text.toString()
+            notesViewModel.noteContent = noteText.text.toString()
+            if(notesViewModel.noteTitle.isNotEmpty() || notesViewModel.noteContent.isNotEmpty()){
+                insertNote()
+            }
+        }else{
+            notesViewModel.noteTitle = titleText.text.toString()
+            notesViewModel.noteContent = noteText.text.toString()
+            notesViewModel.noteColor = notesViewModel.noteColor
+            notesViewModel.noteId = notesViewModel.dbNotesList[notesViewModel.notePosition].id
+            updateNoteInDB()
+        }
+        moveToNotesFragment()
     }
 
     private fun openColorPicker() {

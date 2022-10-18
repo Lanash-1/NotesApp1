@@ -15,6 +15,7 @@
         android:hint="Title"
         android:background="@android:color/transparent"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -28,7 +29,6 @@
         android:layout_marginHorizontal="16dp"
         android:background="@android:color/transparent"
         android:layout_marginTop="16dp"
-
         android:hint="note"
         android:textColor="@color/black"
         app:layout_constraintLeft_toLeftOf="parent"

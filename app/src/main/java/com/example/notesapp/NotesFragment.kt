@@ -39,7 +39,7 @@ class NotesFragment : Fragment() {
 
         (activity as AppCompatActivity).supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(false)
-            setBackgroundDrawable(ColorDrawable(Color.parseColor("#576DE4")))
+            setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
         }
 
 
@@ -88,6 +88,7 @@ class NotesFragment : Fragment() {
         }else{
             viewModel.dbNotesList = mutableListOf()
         }
+        result.close()
     }
 
 }

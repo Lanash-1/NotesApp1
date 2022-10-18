@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#576DE4")))
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#ffffff")))
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
