@@ -1,6 +1,7 @@
 package com.example.notesapp
 
 // imports
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -70,7 +71,11 @@ class NotesFragment : Fragment() {
         adapter.setNotesList(viewModel.dbNotesList)
 
         recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(context, 2)
+        if(activity?.resources?.configuration?.orientation == Configuration.ORIENTATION_PORTRAIT){
+            recyclerView.layoutManager = GridLayoutManager(context, 2)
+        }else{
+            recyclerView.layoutManager = GridLayoutManager(context, 4)
+        }
     }
 
     private fun getNotesList() {

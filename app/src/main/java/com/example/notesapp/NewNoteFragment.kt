@@ -148,7 +148,6 @@ class NewNoteFragment : Fragment() {
 
         val contentResolver = (activity as AppCompatActivity).contentResolver!!
         val result = contentResolver.query(NotesProvider.CONTENT_URI, arrayOf(NotesProvider.COLUMN_ID, NotesProvider.COLUMN_TITLE, NotesProvider.COLUMN_NOTE, NotesProvider.COLUMN_COLOR), null, null, NotesProvider.COLUMN_ID)
-        println("COLOR = ${notesViewModel.noteColor}")
         val cv = ContentValues()
         cv.put(NotesProvider.COLUMN_TITLE, notesViewModel.noteTitle)
         cv.put(NotesProvider.COLUMN_NOTE, notesViewModel.noteContent)

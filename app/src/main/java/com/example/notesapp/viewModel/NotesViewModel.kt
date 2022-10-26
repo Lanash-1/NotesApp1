@@ -14,6 +14,5 @@ class NotesViewModel: ViewModel() {
     var noteContent: String = ""
     var noteColor: String = ""
 
-
     var notePosition = -1
 }

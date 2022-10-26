@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             replace(R.id.notesFragment, NotesFragment())
         }
 
+
 //        val navView = findViewById<NavigationView>(R.id.navView)
 
 //        navView.setNavigationItemSelectedListener {
